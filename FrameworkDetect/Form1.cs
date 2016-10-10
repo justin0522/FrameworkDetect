@@ -25,6 +25,8 @@ namespace FrameworkDetect
                 bool fx20Installed = FrameworkVersionDetection.IsInstalled(FrameworkVersion.Fx20);
                 bool fx30Installed = FrameworkVersionDetection.IsInstalled(FrameworkVersion.Fx30);
                 bool fx35Installed = FrameworkVersionDetection.IsInstalled(FrameworkVersion.Fx35);
+                bool fx40Installed = FrameworkVersionDetection.IsInstalled(FrameworkVersion.Fx40);
+                bool fx45Installed = FrameworkVersionDetection.IsInstalled(FrameworkVersion.Fx45);
 
                 treeView1.Nodes.Add(Environment.MachineName);
                 TreeNode tn;
@@ -122,6 +124,45 @@ namespace FrameworkDetect
                     tn.Text = ".NET Framework 3.5";
                     treeView1.Nodes[0].Nodes.Add(tn);
                 }
+
+                if (fx40Installed)
+                {
+                    tn = new TreeNode();
+                    tn.ForeColor = Color.Green;
+                    tn.Name = ".NET Framework 4.0";
+                    tn.Text = ".NET Framework 4.0";
+                    tn.Nodes.Add("Exact Version: " + FrameworkVersionDetection.GetExactVersion(FrameworkVersion.Fx40));
+                    tn.Nodes.Add("Service Pack: " + FrameworkVersionDetection.GetServicePackLevel(FrameworkVersion.Fx40));
+                    treeView1.Nodes[0].Nodes.Add(tn);
+                }
+                else
+                {
+                    tn = new TreeNode();
+                    tn.ForeColor = Color.Red;
+                    tn.Name = ".NET Framework 4.0";
+                    tn.Text = ".NET Framework 4.0";
+                    treeView1.Nodes[0].Nodes.Add(tn);
+                }
+
+                if (fx45Installed)
+                {
+                    tn = new TreeNode();
+                    tn.ForeColor = Color.Green;
+                    tn.Name = ".NET Framework 4.5 or later";
+                    tn.Text = ".NET Framework 4.5 or later";
+                    tn.Nodes.Add("Exact Version: " + FrameworkVersionDetection.GetExactVersion(FrameworkVersion.Fx45));
+                    tn.Nodes.Add("Service Pack: " + FrameworkVersionDetection.GetServicePackLevel(FrameworkVersion.Fx45));
+                    treeView1.Nodes[0].Nodes.Add(tn);
+                }
+                else
+                {
+                    tn = new TreeNode();
+                    tn.ForeColor = Color.Red;
+                    tn.Name = ".NET Framework 4.5 or later";
+                    tn.Text = ".NET Framework 4.5 or later";
+                    treeView1.Nodes[0].Nodes.Add(tn);
+                }
+
 
                 bool fx30PlusWCFInstalled = FrameworkVersionDetection.IsInstalled(WindowsFoundationLibrary.WCF);
                 bool fx30PlusWPFInstalled = FrameworkVersionDetection.IsInstalled(WindowsFoundationLibrary.WPF);

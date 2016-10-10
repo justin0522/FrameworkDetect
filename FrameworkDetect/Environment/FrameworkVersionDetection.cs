@@ -31,6 +31,9 @@ namespace Campari.Software
         const string Netfx20RegKeyName = "Software\\Microsoft\\NET Framework Setup\\NDP\\v2.0.50727";
         const string Netfx30RegKeyName = "Software\\Microsoft\\NET Framework Setup\\NDP\\v3.0\\Setup";
         const string Netfx35RegKeyName = "Software\\Microsoft\\NET Framework Setup\\NDP\\v3.5";
+        const string Netfx40RegKeyName = "Software\\Microsoft\\NET Framework Setup\\NDP\\v4.0\\Client";
+        const string Netfx45RegKeyName = "SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v4\\Full";
+
         const string Netfx11PlusRegValueName = "Install";
         const string Netfx30PlusRegValueName = "InstallSuccess";
         const string Netfx11PlusSPxRegValueName = "SP";
@@ -185,7 +188,24 @@ namespace Campari.Software
         }
         #endregion
 
+        #region IsNetfx40Installed
+        //https://msdn.microsoft.com/en-us/library/hh925568(v=vs.110).aspx
+        private static bool IsNetfx45Installed()
+        {
+            bool found = false;
+            int regValue = 0;
 
+            if (GetRegistryValue(RegistryHive.LocalMachine, Netfx45RegKeyName, Netfx11PlusRegValueName, RegistryValueKind.DWord, out regValue))
+            {
+                if (regValue == 1)
+                {
+                    found = true;
+                }
+            }
+
+            return found;
+        }
+        #endregion
 
 
 
@@ -440,6 +460,50 @@ namespace Campari.Software
             Version fxVersion = new Version();
 
             if (GetRegistryValue(RegistryHive.LocalMachine, Netfx35RegKeyName, Netfx30PlusVersionRegValueName, RegistryValueKind.String, out regValue))
+            {
+                if (!String.IsNullOrEmpty(regValue))
+                {
+                    fxVersion = new Version(regValue);
+                }
+            }
+
+            return fxVersion;
+        }
+        #endregion
+
+        #region GetNetfx35ExactVersion
+        private static Version GetNetfx40ExactVersion()
+        {
+            string regValue = String.Empty;
+
+            // We can only get the default version if the .NET Framework
+            // is not installed or there was some kind of error retrieving
+            // the data from the registry
+            Version fxVersion = new Version();
+
+            if (GetRegistryValue(RegistryHive.LocalMachine, Netfx40RegKeyName, Netfx30PlusVersionRegValueName, RegistryValueKind.String, out regValue))
+            {
+                if (!String.IsNullOrEmpty(regValue))
+                {
+                    fxVersion = new Version(regValue);
+                }
+            }
+
+            return fxVersion;
+        }
+        #endregion
+
+        #region GetNetfx35ExactVersion
+        private static Version GetNetfx45ExactVersion()
+        {
+            string regValue = String.Empty;
+
+            // We can only get the default version if the .NET Framework
+            // is not installed or there was some kind of error retrieving
+            // the data from the registry
+            Version fxVersion = new Version();
+
+            if (GetRegistryValue(RegistryHive.LocalMachine, Netfx45RegKeyName, Netfx30PlusVersionRegValueName, RegistryValueKind.String, out regValue))
             {
                 if (!String.IsNullOrEmpty(regValue))
                 {
@@ -776,6 +840,14 @@ namespace Campari.Software
                     ret = IsNetfx35Installed();
                     break;
 
+                case FrameworkVersion.Fx40:
+                    ret = IsNetfx40Installed();
+                    break;
+
+                case FrameworkVersion.Fx45:
+                    ret = IsNetfx40Installed();
+                    break;
+
                 default:
                     break;
             }
@@ -840,7 +912,7 @@ namespace Campari.Software
         /// </returns>
         public static int GetServicePackLevel(FrameworkVersion frameworkVersion)
         {
-            int servicePackLevel = -1;
+            int servicePackLevel = 0;
 
             switch (frameworkVersion)
             {
@@ -862,6 +934,14 @@ namespace Campari.Software
 
                 case FrameworkVersion.Fx35:
                     servicePackLevel = GetNetfx35SPLevel();
+                    break;
+
+                case FrameworkVersion.Fx40:
+                    servicePackLevel = 0;
+                    break;
+
+                case FrameworkVersion.Fx45:
+                    servicePackLevel = 0;
                     break;
 
                 default:
@@ -955,6 +1035,14 @@ namespace Campari.Software
 
                 case FrameworkVersion.Fx35:
                     fxVersion = GetNetfx35ExactVersion();
+                    break;
+
+                case FrameworkVersion.Fx40:
+                    fxVersion = GetNetfx40ExactVersion();
+                    break;
+
+                case FrameworkVersion.Fx45:
+                    fxVersion = GetNetfx45ExactVersion();
                     break;
 
                 default:
