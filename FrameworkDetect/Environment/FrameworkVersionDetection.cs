@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-
+using System.Management;
 using Microsoft.Win32;
 
 using Campari.Software.InteropServices;
@@ -21,6 +21,10 @@ namespace Campari.Software
     {
 
         #region class-wide fields
+        const string ProductNameRegKeyName = "SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion";
+        const string ProductNameRegValueName = "ProductName";
+        const string ComputerSystem = "Win32_ComputerSystem";
+
 
         const string Netfx10RegKeyName = "Software\\Microsoft\\.NETFramework\\Policy\\v1.0";
         const string Netfx10RegKeyValue = "3705";
@@ -471,7 +475,7 @@ namespace Campari.Software
         }
         #endregion
 
-        #region GetNetfx35ExactVersion
+        #region GetNetfx40ExactVersion
         private static Version GetNetfx40ExactVersion()
         {
             string regValue = String.Empty;
@@ -493,7 +497,7 @@ namespace Campari.Software
         }
         #endregion
 
-        #region GetNetfx35ExactVersion
+        #region GetNetfx45ExactVersion
         private static Version GetNetfx45ExactVersion()
         {
             string regValue = String.Empty;
@@ -514,6 +518,49 @@ namespace Campari.Software
             return fxVersion;
         }
         #endregion
+
+        #endregion
+
+        #region Computer Basic Info
+
+        private static string GetProductNameInfo()
+        {
+            string regValue = String.Empty;
+            
+            // We can only get the default version if the .NET Framework
+            // is not installed or there was some kind of error retrieving
+            // the data from the registry
+
+            GetRegistryValue(RegistryHive.LocalMachine, ProductNameRegKeyName, ProductNameRegValueName, RegistryValueKind.String, out regValue);
+            
+            return regValue;
+        }
+
+        private static string GetPhysicalMemory()
+        {
+            ManagementClass mc = new ManagementClass(FrameworkVersionDetection.ComputerSystem);
+            ManagementObjectCollection moc = mc.GetInstances();
+            UInt64 memorySize = 0;
+            foreach (ManagementObject mo in moc)
+            {
+                memorySize = Convert.ToUInt64(mo["TotalPhysicalMemory"]);
+            }
+
+            return Convert.ToString(memorySize / (1024 * 1024 * 1024.0));
+            
+        }
+
+        private static string GetCPUID()
+        {
+            string cpuid = string.Empty;
+            ManagementClass mc = new ManagementClass("Win32_Processor");
+            ManagementObjectCollection moc = mc.GetInstances();
+            foreach (ManagementObject mo in moc)
+            {
+                cpuid = mo["Name"].ToString();
+            }
+            return cpuid;
+        }
 
         #endregion
 
@@ -1051,6 +1098,33 @@ namespace Campari.Software
 
             return fxVersion;
         }
+        #endregion
+
+        public static string GetSystemInfo(SystemInfoType type)
+        {
+            string info = string.Empty;
+            switch(type)
+            {
+                case SystemInfoType.Memory:
+                    info = GetPhysicalMemory();
+                    break;
+
+                case SystemInfoType.ProductName:
+                    info = GetProductNameInfo();
+                    break;
+
+                case SystemInfoType.CPU:
+                    info = GetCPUID();
+                    break;
+
+                default:
+
+                    break;
+            }
+            return info;
+        }
+        #region 
+
         #endregion
 
         #region GetExactVersion(WindowsFoundationLibrary foundationLibrary)

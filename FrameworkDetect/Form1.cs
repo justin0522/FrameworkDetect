@@ -28,8 +28,20 @@ namespace FrameworkDetect
                 bool fx40Installed = FrameworkVersionDetection.IsInstalled(FrameworkVersion.Fx40);
                 bool fx45Installed = FrameworkVersionDetection.IsInstalled(FrameworkVersion.Fx45);
 
-                treeView1.Nodes.Add(Environment.MachineName);
+                treeView1.Nodes.Add(string.Format("{0} ({1})", Environment.MachineName, Environment.OSVersion.VersionString));
                 TreeNode tn;
+
+                tn = new TreeNode();
+                tn.ForeColor = Color.Green;
+                tn.Name = "System";
+                tn.Text = "System";
+                tn.Nodes.Add("ProductName: " + FrameworkVersionDetection.GetSystemInfo(SystemInfoType.ProductName));
+                tn.Nodes.Add("Processor: " + FrameworkVersionDetection.GetSystemInfo(SystemInfoType.CPU));
+                tn.Nodes.Add("Installed memory(RAM): " + FrameworkVersionDetection.GetSystemInfo(SystemInfoType.Memory));
+                tn.Nodes.Add("System type");
+                
+                treeView1.Nodes[0].Nodes.Add(tn);
+
                 if (fx10Installed)
                 {
                     tn = new TreeNode();

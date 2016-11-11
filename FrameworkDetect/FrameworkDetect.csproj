@@ -61,12 +61,14 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Environment\FrameworkVersion.cs" />
     <Compile Include="Environment\FrameworkVersionDetection.cs" />
+    <Compile Include="Environment\SystemInfoType.cs" />
     <Compile Include="Environment\WindowsFoundationLibrary.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
